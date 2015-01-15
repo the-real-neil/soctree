@@ -2,7 +2,7 @@
 
 AC_PREREQ([2.68])
 AC_INIT([octree],
-        [0.1.0-snapshot],
+        [m4_esyscmd_s([git describe --always --dirty])],
         [rubicks00@gmail.com],
         [octree],
         [https://github.com/rubicks/octree])
