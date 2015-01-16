@@ -4,40 +4,127 @@
 
 #include <cstddef>
 
-
-octree::node_t*
-octree::create( void )
+namespace
 {
-    octree::node_t*ret = new octree::node_t();
-    ret->parent_ = NULL ;
-    for( size_t i = 0 ; i != 8 ; ++i )
-        ret->children_[i] = NULL ;
-    ret->value_ = 0.0 ;
-    return ret ;
-}
+  using ::octree::node ;
+
+  typedef unsigned char uchar ;
 
 
-void
-octree::destroy( node_t*o )
-{
+  void
+  _destroy( node*o )
+  {
     if( NULL == o ) return ;
-    for( size_t i = 0 ; i != 8 ; ++i ){
-        octree::destroy( o->children_[i] );
-    }
+    _destroy( o->children_[0][0][0] );
+    _destroy( o->children_[0][0][1] );
+    _destroy( o->children_[0][1][0] );
+    _destroy( o->children_[0][1][1] );
+    _destroy( o->children_[1][0][0] );
+    _destroy( o->children_[1][0][1] );
+    _destroy( o->children_[1][1][0] );
+    _destroy( o->children_[1][1][1] );
     delete o ;
     o = NULL ;
+  }
+
+  node*
+  _create( node*parent )
+  {
+    node*ret = new node();
+    ret->parent_ = parent ;
+    ret->children_[0][0][0] = NULL ;
+    ret->children_[0][0][1] = NULL ;
+    ret->children_[0][1][0] = NULL ;
+    ret->children_[0][1][1] = NULL ;
+    ret->children_[1][0][0] = NULL ;
+    ret->children_[1][0][1] = NULL ;
+    ret->children_[1][1][0] = NULL ;
+    ret->children_[1][1][1] = NULL ;
+    return ret ;
+  }
+
+
+#if 0
+
+  node*
+  _insert( node*root, int val )
+  {
+    node*ret = root ;
+    if( NULL == ret ) return ret ;
+    size_t n = 8 ;
+    do{
+      --n ;
+      node*child ;
+      ret->children_
+        [ ( r >> n ) & 1 ]
+        [ ( g >> n ) & 1 ]
+        [ ( b >> n ) & 1 ] = child = _create( ret );
+      ret = child ;
+    }while( n );
+    return ret ;
+  }
+
+  node*
+  _child( size_t n, node*o, uchar r, uchar g, uchar b )
+  {
+    return
+      o->children_
+      [ ( r >> n ) & 1 ]
+      [ ( g >> n ) & 1 ]
+      [ ( b >> n ) & 1 ] ;
+  }
+
+  node*
+  _get( node*root, uchar r, uchar g, uchar b )
+  {
+    node*ret = root ;
+    size_t n = 8 ;
+    while( NULL != ret && 0 < n ){
+      --n ;
+      node*ret = _child( n, ret, r, g, b );
+    }
+    return ret ;
+  }
+
+  void
+  _remove( node*, uchar, uchar, uchar )
+  {
+    
+  }
+#endif
 }
 
 
-octree::node_t*
-octree::insert( octree::node_t*, int, int, int, float )
+node*
+octree::init( void )
 {
-    return NULL ;
+  return _create( NULL );
 }
 
-
-octree::node_t*
-octree::remove( node_t*, int, int, int )
+void
+octree::destroy( node*o )
 {
-    return NULL ;
+  _destroy( o );
 }
+
+#if 0
+
+node*
+octree::insert( node*root, uchar r, uchar g, uchar b )
+{
+  return _insert( root, r, g, b );
+}
+
+node*
+octree::get( node*root, uchar r, uchar g, uchar b )
+{
+  return _get( root, r, g, b );
+}
+
+void
+octree::remove( node*root, uchar r, uchar g, uchar b )
+{
+  _remove( root, r, g, b );
+}
+
+#endif

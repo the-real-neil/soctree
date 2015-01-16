@@ -22,7 +22,7 @@ main( int /* argc */, char**/* argv */ )
     /*         ; */
 
     /* octree::node_t*o = new octree::node_t(); */
-    octree::node_t*o = octree::create();
+    octree::node*o = octree::init();
 
     /* std::cout */
     /*     << "node_t*o == " */

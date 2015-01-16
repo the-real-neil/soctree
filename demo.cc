@@ -5,32 +5,44 @@
 #include <iostream>
 #include <cstdlib>
 
-int
-main( int argc, char**argv )
+struct foo
 {
-    std::cout
-        << std::endl
-        << __PRETTY_FUNCTION__ << " at "
-        << __FILE__ << ":" << std::dec << __LINE__
-        << std::endl
-        ;
+  foo* parent_ ;
+  foo* children_[8] ;
+};
 
-    for( int i = 0 ; i != argc ; ++i )
-        std::cout
-            << "argv[i] == \"" << argv[i] << "\""
-            << std::endl
-            ;
+int
+main( int /* argc */, char**/* argv */ )
+{
+  foo*f = new foo ;
 
-    octree::node_t*o = octree::create();
+  delete f ;
 
-    std::cout
-        << "node_t*o == "
-        << std::hex << std::showbase
-        << reinterpret_cast< unsigned long >( o )
-        << std::endl
-        ;
+  f = NULL ;
+  
+  /* std::cout */
+  /*     << std::endl */
+  /*     << __PRETTY_FUNCTION__ << " at " */
+  /*     << __FILE__ << ":" << std::dec << __LINE__ */
+  /*     << std::endl */
+  /*     ; */
 
-    octree::destroy( o );
+  /* for( int i = 0 ; i != argc ; ++i ) */
+  /*     std::cout */
+  /*         << "argv[i] == \"" << argv[i] << "\"" */
+  /*         << std::endl */
+  /*         ; */
 
-    return EXIT_SUCCESS ;
+  /* octree::node*o = octree::init(); */
+
+  /* std::cout */
+  /*     << "node_t*o == " */
+  /*     << std::hex << std::showbase */
+  /*     << reinterpret_cast< unsigned long >( o ) */
+  /*     << std::endl */
+  /*     ; */
+
+  /* octree::destroy( o ); */
+
+  return EXIT_SUCCESS ;
 }

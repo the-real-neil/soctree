@@ -2,15 +2,24 @@
 
 namespace octree
 {
-    struct node_t
-    {
-        node_t*parent_;
-        node_t*children_[8];
-        float value_;
-    };
+  struct node
+  {
+    node*parent_ ;
+    node*children_[2][2][2] ;
+  };
 
-    node_t* create( void );
-    void destroy( node_t* );
-    node_t* insert( node_t*, int, int, int, float );
-    node_t* remove( node_t*, int, int, int );
+  /* create and return a parent-less (root) node */
+  node*init( void );
+
+  /* recursively destroy the given node */
+  void destroy( node* );
+
+  /* given a root, create (if necessary) and return the specified node */
+  node*insert( node*, int );
+
+  /* given a root, return the specified node if it exists, NULL otherwise */
+  node*get( node*, int );
+
+  /* given a root, remove the specified node if it exists */
+  void remove( node*, int );
 }
