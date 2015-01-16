@@ -47,8 +47,8 @@ dnl   [AC_MSG_ERROR([libX11 missing])])
 
 dnl Checks for header files.
 
-dnl AC_CHECK_HEADER([cstdlib],[],[AC_MSG_ERROR([cstdlib missing])])
-dnl AC_CHECK_HEADER([endian.h],[],[AC_MSG_ERROR([endian.h missing])])
+AC_CHECK_HEADER([cstdlib],[],[AC_MSG_ERROR([cstdlib missing])])
+AC_CHECK_HEADER([endian.h],[],[AC_MSG_ERROR([endian.h missing])])
 dnl AC_CHECK_HEADER([stdint.h],[],[AC_MSG_ERROR([stdint.h missing])])
 
 

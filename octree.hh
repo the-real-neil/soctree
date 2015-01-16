@@ -23,3 +23,5 @@ namespace octree
   /* given a root, remove the specified node if it exists */
   void remove( node*, int );
 }
+
+

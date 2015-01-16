@@ -3,7 +3,7 @@
 #include "octree.hh"
 
 /* #include <iostream> */
-/* #include <cstdlib> */
+#include <cstdlib>
 
 int
 main( int /* argc */, char**/* argv */ )
@@ -34,5 +34,5 @@ main( int /* argc */, char**/* argv */ )
     /* delete o ; */
     octree::destroy( o );
 
-    return 0 ;
+    return EXIT_SUCCESS ;
 }

@@ -27,9 +27,13 @@ noinst_LTLIBRARIES = libcommon.la
 libcommon_la_SOURCES = $(liboctree_la_SOURCES)
 
 check_PROGRAMS = \
-  test_create_delete
+  test_create_delete \
+  test_morton
 
 test_create_delete_SOURCES = test/create_delete.cc
 test_create_delete_LDADD = libcommon.la
+
+test_morton_SOURCES = test/morton.cc
+test_morton_LDADD = libcommon.la
 
 TESTS = $(check_PROGRAMS)
