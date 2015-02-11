@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cassert>
+#include <type_traits>
 
 #include <limits.h>
 
@@ -105,10 +106,11 @@ namespace
   }
 
 
-  int32_t
+  uint32_t
   _morton( uint8_t r, uint8_t g, uint8_t b )
   {
-    int32_t ret = 0 ;
+    uint32_t ret = 0 ;
+#if 0
     for( size_t i = 0 ; i < 8 ; ++i ){
       ret |= 0
         | ((r & ((uint8_t)1 << i)) << (2*i + 0))
@@ -116,19 +118,31 @@ namespace
         | ((b & ((uint8_t)1 << i)) << (2*i + 2))
         ;
     }
+#else
+    ret |= _part3( b );
+    ret <<= 1 ;
+    ret |= _part3( g );
+    ret <<= 1 ;
+    ret |= _part3( r );
+    /* ret |= _part3( r ) << 0 ; */
+    /* ret |= _part3( g ) << 1 ; */
+    /* ret |= _part3( b ) << 2 ; */
+#endif
     return ret ;
   }
 
-  int32_t
+  uint32_t
   _morton( _rgba_type const&o )
   {
     return _morton( o.r, o.g, o.b );
   }
 
-  int32_t
-  _morton( int32_t n )
+  template< typename T >
+  uint32_t
+  _morton( T n )
   {
-    return _morton( _rgba( n ) );
+    static_assert( std::is_integral< T >::value, "integral type required" );
+    return _morton( _rgba( uint32_t( n ) ) );
   }
 
 
@@ -185,30 +199,43 @@ main(int,char**)
   assert( "11000011000011000011b"   == _bitstr(0x0c30c3) );
   assert( "1001001001001001001001b" == _bitstr(0x249249) );
 
+  assert( 101101101101101101101101_b == _morton( 111111110000000011111111_b ) );
+  assert( 110110110110110110110110_b == _morton( 111111111111111100000000_b ) );
+  assert( 011011011011011011011011_b == _morton( 000000001111111111111111_b ) );
+
+  assert( 111111111111000000000000_b == _morton( 111100001111000011110000_b ) );
+  assert( 110110110110001001001001_b == _morton( 111100001111000000001111_b ) );
 
   assert( 0x249249 == _part3( 0xff ) );
 
+  
+  /* std::cout */
+  /*   << std::dec */
+  /*   << "_int32( 5, 9, 1 ) == " */
+  /*   << _int32( 5, 9, 1 ) */
+  /*   << std::endl */
+  /*   ; */
 
-  std::cout
-    << std::dec
-    << "_int32( 5, 9, 1 ) == "
-    << _int32( 5, 9, 1 )
-    << std::endl
-    ;
+  /* std::cout */
+  /*   << std::dec */
+  /*   << "_morton( 5, 9, 1 ) == " */
+  /*   << _morton( 5, 9, 1 ) */
+  /*   << std::endl */
+  /*   ; */
 
-  std::cout
-    << std::dec
-    << "_morton( 5, 9, 1 ) == "
-    << _morton( 5, 9, 1 )
-    << std::endl
-    ;
+  /* std::cout */
+  /*   << std::dec */
+  /*   << "_morton( _int32( 5, 9, 1 ) ) == " */
+  /*   << _morton( _int32( 5, 9, 1 ) ) */
+  /*   << std::endl */
+  /*   ; */
 
-  std::cout
-    << std::dec
-    << "_morton( _int32( 5, 9, 1 ) ) == "
-    << _morton( _int32( 5, 9, 1 ) )
-    << std::endl
-    ;
+  /* for( unsigned n = 0 ; n < 256 ; ++n ){ */
+  /*   std::cout */
+  /*     << std::hex << std::showbase */
+  /*     << "_part3( " << n << " ) == " << _part3( n ) << std::endl */
+  /*     ; */
+  /* } */
 
   return EXIT_SUCCESS ;
 }

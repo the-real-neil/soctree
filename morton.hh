@@ -6,8 +6,8 @@
 
 namespace morton
 {
-  int encode( int );
-  int decode( int );
+  unsigned encode( unsigned );
+  unsigned decode( unsigned );
 }
 
 
