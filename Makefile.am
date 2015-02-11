@@ -6,7 +6,14 @@ AM_CXXFLAGS = -Wall -Wextra -Werror -Wconversion -pedantic-errors
 
 
 lib_LTLIBRARIES = liboctree.la
-liboctree_la_SOURCES = octree.hh octree.cc
+liboctree_la_SOURCES = \
+  binlit.cc            \
+  binlit.hh            \
+  morton.cc            \
+  morton.hh            \
+  octree.cc            \
+  octree.hh
+
 
 # noinst_lib_LTLIBRARIES = liboctree.la
 # liboctree_la_SOURCES = octree.hh octree.cc

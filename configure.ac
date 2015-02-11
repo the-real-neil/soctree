@@ -23,38 +23,24 @@ AX_CXX_COMPILE_STDCXX_11
 
 # Checks for libraries.
 
-dnl AC_CHECK_LIB([dl],[dlsym],[],
-dnl   [AC_MSG_ERROR([libdl missing])])
-
-dnl AC_CHECK_LIB([fltk],[fl_system],[],
-dnl   [AC_MSG_ERROR([libfltk missing])])
-
-#AC_CHECK_LIB([fltk_images],[fl_numericsort],[],
-#  [AC_MSG_ERROR([libfltk_images missing])])
-
-dnl AC_CHECK_LIB([jpeg],[jpeg_start_output],[],
-dnl   [AC_MSG_ERROR([libjpeg missing])])
-
-dnl AC_CHECK_LIB([png],[png_malloc],[],
-dnl   [AC_MSG_ERROR([libpng missing])])
-
 dnl AC_CHECK_LIB([z],[gzopen],[],
 dnl   [AC_MSG_ERROR([libz missing])])
-
-dnl AC_CHECK_LIB([X11],[XInitThreads],[],
-dnl   [AC_MSG_ERROR([libX11 missing])])
 
 
 dnl Checks for header files.
 
 AC_CHECK_HEADER([cstdlib],[],[AC_MSG_ERROR([cstdlib missing])])
-AC_CHECK_HEADER([endian.h],[],[AC_MSG_ERROR([endian.h missing])])
+dnl AC_CHECK_HEADER([endian.h],[],[AC_MSG_ERROR([endian.h missing])])
 dnl AC_CHECK_HEADER([stdint.h],[],[AC_MSG_ERROR([stdint.h missing])])
 
 
 # Checks for typedefs, structures, and compiler characteristics.
 
 AC_C_INLINE
+
+AC_C_BIGENDIAN([AC_DEFINE([IS_BIG_ENDIAN],[1],[define if big endian])],
+               [AC_DEFINE([IS_LITTLE_ENDIAN],[1],[define if little endian])],
+               [AC_MSG_ERROR([unknown endianness])])
 
 AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T

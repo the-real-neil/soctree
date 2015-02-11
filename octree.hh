@@ -1,5 +1,9 @@
 /* octree/octree.hh */
 
+#ifndef ___OCTREE___OCTREE_HH___
+#define ___OCTREE___OCTREE_HH___
+
+
 namespace octree
 {
   struct node
@@ -25,3 +29,4 @@ namespace octree
 }
 
 
+#endif//ndef ___OCTREE___OCTREE_HH___
