@@ -6,6 +6,8 @@
 
 namespace morton
 {
+  unsigned expand( unsigned );
+  unsigned shrink( unsigned );
   unsigned encode( unsigned );
   unsigned decode( unsigned );
 }

@@ -1,16 +1,16 @@
 /* octree/morton.cc */
 
 
+#include <limits.h>
+#include <stdint.h>
+
+#include "morton.hh"
+
 #if HAVE_CONFIG_H
 #  include "config.h"
 #else
 #  error "missing config.h"
 #endif
-
-#include "morton.hh"
-
-#include <limits.h>
-#include <stdint.h>
 
 
 namespace
@@ -218,15 +218,15 @@ namespace
 #if 0
     /*  */
 #elif IS_LITTLE_ENDIAN
-    uint8_t r ;
-    uint8_t g ;
-    uint8_t b ;
-    uint8_t a ;
+    uint8_t r_ ;
+    uint8_t g_ ;
+    uint8_t b_ ;
+    uint8_t a_ ;
 #elif IS_BIG_ENDIAN
-    uint8_t a ;
-    uint8_t b ;
-    uint8_t g ;
-    uint8_t r ;
+    uint8_t a_ ;
+    uint8_t b_ ;
+    uint8_t g_ ;
+    uint8_t r_ ;
 #else
 #  error "unsupported endianness"
 #endif
@@ -234,7 +234,7 @@ namespace
 
   union _rgba_union
   {
-    int32_t int32_ ;
+    uint32_t uint32_ ;
     _rgba_type rgba_ ;
   };
 
@@ -242,8 +242,34 @@ namespace
   _rgba( uint32_t n )
   {
     _rgba_union un ;
-    un.int32_ = n ;
+    un.uint32_ = n ;
     return un.rgba_ ;
+  }
+
+  unsigned
+  _expand( unsigned v )
+  {
+    v &= 0x0000ff ;
+    v ^= v << 8 ;
+    v &= 0x00f00f ;
+    v ^= v << 4 ;
+    v &= 0x0c30c3 ;
+    v ^= v << 2 ;
+    v &= 0x249249 ;
+    return v ;
+  }
+
+  unsigned
+  _shrink( unsigned v )
+  {
+    v &= 0x249249 ;
+    v ^= v >> 2 ;
+    v &= 0x0c30c3 ;
+    v ^= v >> 4 ;
+    v &= 0x00f00f ;
+    v ^= v >> 8 ;
+    v &= 0x0000ff ;
+    return v ;
   }
 
   unsigned
@@ -259,7 +285,7 @@ namespace
   unsigned
   _encode( _rgba_type const&o )
   {
-    return _encode( o.r, o.g, o.b );
+    return _encode( o.r_, o.g_, o.b_ );
   }
 
   unsigned
@@ -269,15 +295,23 @@ namespace
   }
 
 
-
   unsigned
   _decode( unsigned n )
   {
-    return n ;
+    unsigned ret = 0 ;
+    ret |= _shrink(n>>2) ;
+    ret <<= CHAR_BIT ;
+    ret |= _shrink(n>>1) ;
+    ret <<= CHAR_BIT ;
+    ret |= _shrink(n>>0) ;
+    return ret ;
   }
 }
 
 
+unsigned morton::expand( unsigned n ){ return _expand( n ); }
+
+unsigned morton::shrink( unsigned n ){ return _shrink( n ); }
 
 unsigned morton::encode( unsigned n ){ return _encode( n ); }
 
