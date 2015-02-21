@@ -6,11 +6,7 @@
 
 namespace octree
 {
-  struct node
-  {
-    node*parent_ ;
-    node*children_[2][2][2] ;
-  };
+  struct node ;
 
   /* create and return a parent-less (root) node */
   node*init( void );
@@ -19,13 +15,16 @@ namespace octree
   void destroy( node* );
 
   /* given a root, create (if necessary) and return the specified node */
-  node*insert( node*, int );
-
-  /* given a root, return the specified node if it exists, NULL otherwise */
-  node*get( node*, int );
+  node*insert( node*, unsigned );
 
   /* given a root, remove the specified node if it exists */
-  void remove( node*, int );
+  void remove( node*, unsigned );
+
+  /* given a root, return the specified node if it exists, NULL otherwise */
+  node*get( node*, unsigned );
+
+  /* given a node, return its value */
+  unsigned value( node* );
 }
 
 

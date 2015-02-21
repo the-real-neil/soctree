@@ -2,7 +2,14 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CXXFLAGS = -Wall -Wextra -Werror -Wconversion -pedantic-errors
+AM_CXXFLAGS =          \
+  -Wall                \
+  -Wconversion         \
+  -Werror              \
+  -Wextra              \
+  -fsanitize=address   \
+  -fsanitize=undefined \
+  -pedantic-errors
 
 
 lib_LTLIBRARIES = liboctree.la
