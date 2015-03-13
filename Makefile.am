@@ -7,8 +7,6 @@ AM_CXXFLAGS =          \
   -Wconversion         \
   -Werror              \
   -Wextra              \
-  -fsanitize=address   \
-  -fsanitize=undefined \
   -pedantic-errors
 
 

@@ -2,55 +2,61 @@
 
 #include "octree.hh"
 
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
 
+
 int
-main( int /* argc */, char**/* argv */ )
+main( int, char** )
 {
-  /* std::cout */
-  /*     << std::endl */
-  /*     << __PRETTY_FUNCTION__ << " at " */
-  /*     << __FILE__ << ":" << std::dec << __LINE__ */
-  /*     << std::endl */
-  /*     ; */
+  using namespace octree ;
 
-  /* for( int i = 0 ; i != argc ; ++i ) */
-  /*     std::cout */
-  /*         << "argv[i] == \"" << argv[i] << "\"" */
-  /*         << std::endl */
-  /*         ; */
+  node*o = nullptr ;
 
-  /* octree::node_t*o = new octree::node_t(); */
-  octree::node*o = nullptr ;
+  assert( nullptr == o );
+  assert( 0 == weight(o) );
+  assert( -1 == value(o) );
 
-  std::cout
-    << std::hex << std::showbase
-    << std::endl << "octree::node * o == " << o
-    << std::endl << "octree::value( o ) == " << octree::value( o )
-    << std::endl ;
+  o = init();
 
-  o = octree::init();
+  assert( nullptr != o );
+  assert( 0 == weight(o) );
+  assert( -1 == value(o) );
+
+  insert(o,0x42);
+
+  assert( 1 == weight(o) );
+  assert( 0x42 == value(o) );
+
+  return EXIT_SUCCESS ;
 
   std::cout
     << std::hex << std::showbase
     << std::endl << "octree::node * o == " << o
     << std::endl << "octree::value( o ) == " << octree::value( o )
+    << std::dec << std::noshowbase
+    << std::endl << "octree::weight( o ) == " << octree::weight( o )
     << std::endl ;
-  /* std::cout */
-  /*     << "node_t*o == " */
-  /*     << std::hex << std::showbase */
-  /*     << reinterpret_cast< unsigned long >( o ) */
-  /*     << std::endl */
-  /*     ; */
+
+  o = octree::insert(o,0x42);
+
+  std::cout
+    << std::hex << std::showbase
+    << std::endl << "octree::node * o == " << o
+    << std::endl << "octree::value( o ) == " << octree::value( o )
+    << std::dec << std::noshowbase
+    << std::endl << "octree::weight( o ) == " << octree::weight( o )
+    << std::endl ;
 
   /* delete o ; */
   octree::destroy( o );
+  o = nullptr ;
 
   std::cout
     << std::hex << std::showbase
     << std::endl << "octree::node * o == " << o
-    /* << std::endl << "octree::value( o ) == " << octree::value( o ) */
+    << std::endl << "octree::value( o ) == " << octree::value( o )
     << std::endl ;
 
   return EXIT_SUCCESS ;

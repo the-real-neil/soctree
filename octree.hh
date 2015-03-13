@@ -8,23 +8,26 @@ namespace octree
 {
   struct node ;
 
-  /* create and return a parent-less (root) node */
+  /* create and return the root node of an empty tree */
   node*init( void );
 
   /* recursively destroy the given node */
   void destroy( node* );
 
   /* given a root, create (if necessary) and return the specified node */
-  node*insert( node*, unsigned );
+  node*insert( node*, int );
 
   /* given a root, remove the specified node if it exists */
-  void remove( node*, unsigned );
+  void remove( node*, int );
 
   /* given a root, return the specified node if it exists, NULL otherwise */
-  node*get( node*, unsigned );
+  node*get( node*, int );
 
   /* given a node, return its value */
-  unsigned value( node* );
+  int value( node* );
+
+  /* take a node, return its weight */
+  int weight( node* );
 }
 
 
