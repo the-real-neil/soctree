@@ -20,16 +20,22 @@ main( int, char** )
 
   o = init();
 
+  /* init should return non-null ptr to unused root node */
   assert( nullptr != o );
   assert( 0 == weight(o) );
   assert( -1 == value(o) );
 
-  assert( o == insert(o,0x42) );
+  /* first insert should fill root node */
+  assert( o == insert(o,0) );
   assert( 1 == weight(o) );
-  assert( 0x42 == value(o) );
+  assert( 0 == value(o) );
 
-  assert( insert(o,0xff) );
+  /* second insert */
+  assert( insert(o,1) );
+  assert( 2 == weight(o) );
 
+  /* duplicate insert */
+  assert( insert(o,1) );
   assert( 2 == weight(o) );
 
   destroy(o);

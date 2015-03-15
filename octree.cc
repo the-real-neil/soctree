@@ -1,6 +1,5 @@
 /* octree/octree.cc */
 
-#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
@@ -67,7 +66,7 @@ namespace
 {
   template< typename T >
   bool
-  _is_aligned( T*p, size_t n = alignof(T) )
+  _is_aligned( T const*const p, size_t const n = alignof(T) )
   {
     return 0 == reinterpret_cast<uintptr_t>(p) % n ;
   }
@@ -124,7 +123,7 @@ namespace
   int _weight_recursive( node*o )
   {
     SPIT( std::cout << std::endl );
-    assert(o);
+
     if( _is_leaf(o) ) return 1 ;
 
     node*children = _children(o);
