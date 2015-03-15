@@ -24,10 +24,15 @@ main( int, char** )
   assert( 0 == weight(o) );
   assert( -1 == value(o) );
 
-  insert(o,0x42);
-
+  assert( o == insert(o,0x42) );
   assert( 1 == weight(o) );
   assert( 0x42 == value(o) );
+
+  assert( insert(o,0xff) );
+
+  assert( 2 == weight(o) );
+
+  destroy(o);
 
   return EXIT_SUCCESS ;
 

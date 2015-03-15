@@ -1,8 +1,10 @@
 /* octree/octree.cc */
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
+#include <iostream>
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -13,7 +15,27 @@
 #include "octree.hh"
 
 
+#define UINT24( V ) (( 0xffffff & (V) ))
+
+#define VAL( NODEPTR ) (UINT24((NODEPTR)->value_))
+
 #define MY_STATIC_ASSERT( EXPR ) static_assert((EXPR),#EXPR)
+
+#if 0
+#  define SPIT( OSTREAM )     \
+  do{                         \
+    OSTREAM                   \
+      << __PRETTY_FUNCTION__  \
+      << "; "                 \
+      << __FILE__             \
+      << ":"                  \
+      << std::dec << __LINE__ \
+      << std::endl ;          \
+  }while(0)                   \
+/**/
+#else
+#  define SPIT( _ ) do{}while(0)
+#endif
 
 
 namespace octree
@@ -28,7 +50,7 @@ namespace octree
       :parent_(parent)
       ,children_(nullptr)
       ,leaf_(1)
-      ,value_(0xffffff & v)
+      ,value_(UINT24(v))
     {}
     node(node*parent)
       :parent_(parent)
@@ -43,7 +65,33 @@ namespace octree
 
 namespace
 {
+  template< typename T >
+  bool
+  _is_aligned( T*p, size_t n = alignof(T) )
+  {
+    return 0 == reinterpret_cast<uintptr_t>(p) % n ;
+  }
+
   using ::octree::node ;
+
+#if 0
+  std::ostream&
+  operator<<( std::ostream&os, node const&x )
+  {
+    return
+      os
+      << "{"
+      << "parent_:" << x.parent_
+      << ","
+      << "children_:" << x.children_
+      << ","
+      << "leaf_:" << x.leaf_
+      << ","
+      << "value_:" << x.value_
+      << "}"
+      ;
+  }
+#endif
 
   uint32_t _value( node*o )
   {
@@ -53,7 +101,11 @@ namespace
   }
 
   node*_children     ( node*o ) { return o->children_ ; }
-  bool _has_children ( node*o ) { return _children(o) ; }
+  bool _has_children ( node*o )
+  {
+    node const*const children( _children(o) );
+    return children && _is_aligned(children) ;
+  }
 
   uint8_t _leaf ( node*o ) { return o->leaf_     ; }
   bool _is_leaf ( node*o ) { return 1 & _leaf(o) ; }
@@ -71,7 +123,8 @@ namespace
 
   int _weight_recursive( node*o )
   {
-    //assert(o)
+    SPIT( std::cout << std::endl );
+    assert(o);
     if( _is_leaf(o) ) return 1 ;
 
     node*children = _children(o);
@@ -84,46 +137,78 @@ namespace
     return acc ;
   }
   int _weight( node*o ){ return _weight_recursive( o ); }
-  
 
-    
+
+
   void
   _destroy_recursive( node*o )
   {
-    node*children = _children(o);
-    if(children){
+    SPIT( std::cout << std::endl );
+    if( _has_children(o) ){
+      node*children = _children(o);
       for( size_t i = 0 ; i < 8 ; ++i ){
-        _destroy_recursive( children + i );
+        _destroy_recursive( children +i );
       }
-      delete[]children;
+      delete [] children ;
     }
     if( ! o->parent_ ) delete o ;
   }
+
+  size_t
+  _idx8( int const v, size_t const d )
+  {
+    return ( 7 & ( v >> (( 7 - d ) * 3) ) );
+  }
+
 
   /* take a node, value, and depth (zero means root) */
   node*
   _insert( node*o, int const v, size_t const d )
   {
+    SPIT( std::cout << std::endl );
+
     //assert(o);
     /* at level 0, shift 21 bits */
     /* at level 7, shift  0 bits */
-    size_t const idx = 7 & ( v >> ((7-d)*3) ) ;
 
-    if( _is_leaf(o) ){
-      /* leaf node */
-      return nullptr ; // todo
-    }else{
-      node*children = _children(o);
-      if(children){
-        /* interior node */
-        return _insert( children + idx, v, d+1 );
-      }else{
-        /* unused node */
-        o->leaf_ = 1 ;
-        o->value_ = 0xffffff & v ;
-        return o ;
-      }
+    if( _has_children(o) ){
+      SPIT( std::cout );
+      return _insert( _children(o) + _idx8(v,d), v, d+1 );
     }
+
+    if( ! _is_leaf(o) ){
+      SPIT( std::cout << std::endl );
+      /* unused node */
+      o->leaf_ = 1 ;
+      o->value_ = UINT24(v) ;
+      return o ;
+    }
+
+    /* else occupied leaf */
+
+    if( UINT24(v) == o->value_ ){
+      /* same value */
+      return o ;
+    }
+
+    /* else different value */
+
+    o->leaf_ = 0 ; // clear leaf bit
+
+    int w = o->value_ ; // save old value
+
+    o->value_ = 0 ; // clear value
+
+    o->children_ = new node[8]; // allocate children
+    for( size_t i = 0; i != 8; ++i ){
+      (o->children_+i)->parent_ = o ;
+    }
+
+    /* insert old value */
+    _insert( _children(o) + _idx8(w,d), w, d+1 );
+
+    /* recurse with given value */
+    return _insert( _children(o) + _idx8(v,d), v, d+1 );
   }
 }
 
@@ -137,7 +222,8 @@ int octree::weight( node*o ){ return _empty(o) ? 0 : _weight(o); }
 
 node*octree::insert( node*o, int v )
 {
-  return o ? nullptr : _insert(o,v,0) ;
+  SPIT( std::cout << std::endl );
+  return o ? _insert(o,v,0) : nullptr ;
 }
 
 
