@@ -23,11 +23,14 @@ namespace octree
   /* given a root, return the specified node if it exists, NULL otherwise */
   node*get( node*, int );
 
-  /* given a node, return its value */
+  /* take a node, return its value */
   int value( node* );
 
-  /* take a node, return its weight */
+  /* take a node, return the weight contained */
   int weight( node* );
+
+  /* take a node, return the depth contained */
+  int depth( node* );
 }
 
 

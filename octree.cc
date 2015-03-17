@@ -2,8 +2,8 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <type_traits>
 #include <iostream>
+#include <type_traits>
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -126,16 +126,32 @@ namespace
 
     if( _is_leaf(o) ) return 1 ;
 
-    node*children = _children(o);
-    if( ! children ) return 0 ;
+    if( ! _has_children(o) ) return 0 ;
 
     int acc = 0 ;
     for( size_t i = 0 ; i != 8 ; ++i ){
-      acc += _weight_recursive( children + i );
+      acc += _weight_recursive( _children(o) + i );
     }
     return acc ;
   }
   int _weight( node*o ){ return _weight_recursive( o ); }
+
+
+  int _depth_recursive( node*o )
+  {
+    SPIT( std::cout << std::endl );
+
+    if( _is_leaf(o) ) return 0 ;
+
+    if( ! _has_children(o) ) return 0 ;
+
+    int acc = 0 ;
+    for( size_t i = 0 ; i != 8 ; ++i ){
+      acc = std::max( acc, _depth_recursive( _children(o) + i ) );
+    }
+    return 1 + acc ;
+  }
+  int _depth( node*o ){ return _depth_recursive( o ); }
 
 
 
@@ -218,6 +234,8 @@ void octree::destroy( node*o ){ if(!_empty(o)) _destroy_recursive(o); }
 int octree::value( node*o ){ return o && _is_leaf(o) ? _value(o) : -1 ; }
 
 int octree::weight( node*o ){ return _empty(o) ? 0 : _weight(o); }
+
+int octree::depth( node*o ){ return _empty(o) ? 0 : _depth(o); }
 
 node*octree::insert( node*o, int v )
 {

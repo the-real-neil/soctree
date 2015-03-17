@@ -24,19 +24,23 @@ main( int, char** )
   assert( nullptr != o );
   assert( 0 == weight(o) );
   assert( -1 == value(o) );
+  assert( 0 == depth(o) );
 
   /* first insert should fill root node */
   assert( o == insert(o,0) );
   assert( 1 == weight(o) );
   assert( 0 == value(o) );
+  assert( 0 == depth(0) );
 
   /* second insert */
   assert( insert(o,1) );
   assert( 2 == weight(o) );
+  assert( 8 == depth(o) );
 
-  /* duplicate insert */
+  /* duplicate insert should change nothing */
   assert( insert(o,1) );
   assert( 2 == weight(o) );
+  assert( 8 == depth(o) );
 
   destroy(o);
 
