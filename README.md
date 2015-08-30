@@ -1,9 +1,9 @@
-octree
+soctree
 ======
 
-![Screenshot](https://raw.githubusercontent.com/rubicks/octree/master/images/octree.png)
+![Screenshot](https://raw.githubusercontent.com/rubicks/soctree/master/images/octree.png)
 
-An (almost functional) octree implementation for RGB color quantization
+A stupid octree implementation for RGB color quantization
 
-Octree image credit: [Mortis69](https://github.com/Mortis69)
+image credit: [Mortis69](https://github.com/Mortis69)
 
