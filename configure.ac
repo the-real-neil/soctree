@@ -1,13 +1,13 @@
-# octree/configure.ac
+# github.com/rubicks/soctree/configure.ac
 
 AC_PREREQ([2.68])
-AC_INIT([octree],
+AC_INIT([soctree],
         [m4_esyscmd_s([git describe --always --dirty])],
         [rubicks00@gmail.com],
-        [octree],
-        [https://github.com/rubicks/octree])
-AC_LANG_PUSH([C++])
-AC_CONFIG_SRCDIR([octree.hh])
+        [soctree],
+        [https://github.com/rubicks/soctree])
+AC_LANG_PUSH([C])
+AC_CONFIG_SRCDIR([soctree.h])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([subdir-objects])
@@ -16,9 +16,7 @@ LT_PREREQ([2.4])
 LT_INIT([shared])
 
 # Checks for programs.
-AC_PROG_CXX
-AX_CXX_COMPILE_STDCXX_11
-#AC_PROG_CC
+AC_PROG_CC
 
 
 # Checks for libraries.
@@ -29,7 +27,7 @@ dnl   [AC_MSG_ERROR([libz missing])])
 
 dnl Checks for header files.
 
-AC_CHECK_HEADER([cstdlib],[],[AC_MSG_ERROR([cstdlib missing])])
+AC_CHECK_HEADER([stdlib.h],[],[AC_MSG_ERROR([stdlib.h missing])])
 dnl AC_CHECK_HEADER([endian.h],[],[AC_MSG_ERROR([endian.h missing])])
 dnl AC_CHECK_HEADER([stdint.h],[],[AC_MSG_ERROR([stdint.h missing])])
 

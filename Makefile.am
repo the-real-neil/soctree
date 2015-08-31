@@ -1,4 +1,5 @@
-# octree/Makefile.am
+# github.com/rubicks/soctree/Makefile.am
+
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -12,12 +13,10 @@ AM_CXXFLAGS =          \
 
 lib_LTLIBRARIES = liboctree.la
 liboctree_la_SOURCES = \
-  binlit.cc            \
-  binlit.hh            \
-  morton.cc            \
-  morton.hh            \
-  octree.cc            \
-  octree.hh
+  morton.c             \
+  morton.h             \
+  octree.c             \
+  octree.h
 
 
 # noinst_lib_LTLIBRARIES = liboctree.la
@@ -26,7 +25,6 @@ liboctree_la_SOURCES = \
 # bin_PROGRAMS = demo
 # demo_SOURCES = demo.cc
 # demo_LDADD = liboctree.la
-
 
 
 # When check_PROGRAMS are linked against dynamic lib_LTLIBRARIES, automake
@@ -42,10 +40,10 @@ check_PROGRAMS = \
   test_create_delete \
   test_morton
 
-test_create_delete_SOURCES = test/create_delete.cc
+test_create_delete_SOURCES = test/create_delete.c
 test_create_delete_LDADD = libcommon.la
 
-test_morton_SOURCES = test/morton.cc
+test_morton_SOURCES = test/morton.c
 test_morton_LDADD = libcommon.la
 
 TESTS = $(check_PROGRAMS)
