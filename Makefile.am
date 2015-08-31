@@ -15,8 +15,8 @@ lib_LTLIBRARIES = liboctree.la
 liboctree_la_SOURCES = \
   morton.c             \
   morton.h             \
-  octree.c             \
-  octree.h
+  soctree.c            \
+  soctree.h
 
 
 # noinst_lib_LTLIBRARIES = liboctree.la
