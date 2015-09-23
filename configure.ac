@@ -6,7 +6,7 @@ AC_INIT([soctree],
         [rubicks00@gmail.com],
         [soctree],
         [https://github.com/rubicks/soctree])
-AC_LANG_PUSH([C])
+AC_LANG_PUSH([C++])
 AC_CONFIG_SRCDIR([soctree.h])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])

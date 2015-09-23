@@ -3,6 +3,10 @@
 #ifndef ___SOCTREE___SOCTREE_H___
 #define ___SOCTREE___SOCTREE_H___
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* create and return the root node of an empty tree */
 void* soctree_init(void);
 
@@ -26,5 +30,9 @@ int soctree_depth(void*);
 
 /* take a node, return its value */
 int soctree_value(void*);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // ndef ___SOCTREE___SOCTREE_H___
