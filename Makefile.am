@@ -3,20 +3,20 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CXXFLAGS =		\
+AM_CFLAGS =		\
   -Wall			\
   -Wconversion		\
   -Werror		\
   -Wextra		\
   -pedantic-errors	\
-  -std=c++11
+  -std=gnu11
 
 
 lib_LTLIBRARIES = liboctree.la
 liboctree_la_SOURCES = \
-  morton.cc            \
+  morton.c             \
   morton.h             \
-  soctree.cc           \
+  soctree.c            \
   soctree.h
 
 

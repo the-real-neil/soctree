@@ -6,14 +6,14 @@ AC_INIT([soctree],
         [rubicks00@gmail.com],
         [soctree],
         [https://github.com/rubicks/soctree])
-AC_LANG_PUSH([C++])
+AC_LANG_PUSH([C])
 AC_CONFIG_SRCDIR([soctree.h])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([subdir-objects])
-LT_PREREQ([2.4])
+LT_PREREQ([2.4.6])
 #LT_INIT([dlopen])
-LT_INIT([shared])
+LT_INIT([disable-shared])
 
 # Checks for programs.
 AC_PROG_CC
