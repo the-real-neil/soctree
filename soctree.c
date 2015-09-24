@@ -78,7 +78,7 @@ bool _is_aligned(T const *const p, size_t const n = alignof(T)) {
 static int _imax(int a, int b) { return a < b ? b : a; }
 
 static bool _is_aligned(void *ptr) {
-  return 0 == (uintptr_t)ptr % sizeof(_node_t);
+  return !((uintptr_t)ptr % sizeof(_node_t));
 }
 
 static _node_t *_validate(void *ptr) {
@@ -109,6 +109,12 @@ static _node_t *_children(_node_t *o) { return o->un_.children_; }
 static bool _has_children(_node_t *o) { return _validate(_children(o)); }
 
 static bool _is_leaf(_node_t *o) { return 1 & o->un_.leaf_.lo08_; }
+
+static void _leaf_set(_node_t *o) { o->un_.leaf_.lo08_ |= 1; }
+
+static void _leaf_clear(_node_t *o) { o->un_.leaf_.lo08_ &= ~1; }
+
+static void _value_set(_node_t *o, int v) { o->un_.leaf_.hi24_ = UINT24(v); }
 
 static int _weight_recursive(_node_t *o) {
   SPIT(std::cout << std::endl);
@@ -172,8 +178,8 @@ _node_t *_insert(_node_t *o, int v, size_t d) {
   if (!_is_leaf(o)) {
     SPIT(std::cout << std::endl);
     /* unused _node_t */
-    o->leaf_ = 1;
-    o->value_ = UINT24(v);
+    _leaf_set(o);
+    _value_set(o, v);
     return o;
   }
 
