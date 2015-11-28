@@ -7,29 +7,30 @@
 extern "C" {
 #endif
 
-/* create and return the root node of an empty tree */
-void* soctree_init(void);
+typedef struct soctree soctree_t;
 
-/* recursively destroy the given node */
-void soctree_free(void*);
+/* create and initialize an empty soctree; return pointer on success, NULL on
+ * failure */
+soctree_t* soctree_new(void);
 
-/* given a root, create (if necessary) and return the specified node */
-void* soctree_insert(void*, int);
+/* release the given soctree */
+void soctree_delete(soctree_t*);
 
-/* given a root, remove the specified node if it exists */
-void* soctree_remove(void*, int);
+/* insert into the given soctree a copy of the given value; return 0 on success,
+ * negative on failure */
+int soctree_insert(soctree_t*, int);
 
-/* given a root, return the specified node if it exists, NULL otherwise */
-void* soctree_find(void*, int);
+/* erase from the given soctree a copy of the given value; return 0 on success,
+ * negative on failure */
+int soctree_erase(soctree_t*, int);
 
-/* take a node, return the return the weight contained */
-int soctree_weight(void*);
+/* search the given soctree for the given value; return 0 on success, negative
+ * on failure */
+int soctree_find(soctree_t*, int);
 
-/* take a node, return the depth contained */
-int soctree_depth(void*);
-
-/* take a node, return its value */
-int soctree_value(void*);
+/* get the size of the given soctree; return non-negative 24-bit value on
+ * success, negative on failure */
+int soctree_size(soctree_t*);
 
 #ifdef __cplusplus
 }

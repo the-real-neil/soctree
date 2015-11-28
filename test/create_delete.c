@@ -1,68 +1,38 @@
-/* octree/test/create_delete.cc */
+/* soctree/test/create_delete.c */
 
 #include "soctree.h"
 
 #include <assert.h>
 #include <stdlib.h>
 
-int main(int, char**) {
-  using namespace octree;
+int main(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+  soctree_t* s = soctree_new();
 
-  node* o = nullptr;
+  assert(NULL != s);
+  assert(0 == soctree_size(s));
 
-  assert(nullptr == o);
-  assert(0 == weight(o));
-  assert(-1 == value(o));
+  /* empty soctree find fail */
+  assert(-1 == soctree_find(s, 0));
 
-  o = init();
-
-  /* init should return non-null ptr to unused root node */
-  assert(nullptr != o);
-  assert(0 == weight(o));
-  assert(-1 == value(o));
-  assert(0 == depth(o));
-
-  /* first insert should fill root node */
-  assert(o == insert(o, 0));
-  assert(1 == weight(o));
-  assert(0 == value(o));
-  assert(0 == depth(0));
+  /* first insert */
+  assert(0 == soctree_insert(s, 0));
+  assert(1 == soctree_size(s));
+  assert(0 == soctree_find(s, 0));
 
   /* second insert */
-  assert(insert(o, 1));
-  assert(2 == weight(o));
-  assert(8 == depth(o));
+  assert(0 == soctree_insert(s, 0xffffff));
+  assert(2 == soctree_size(s));
+  assert(0 == soctree_find(s, 0xffffff));
 
-  /* duplicate insert should change nothing */
-  assert(insert(o, 1));
-  assert(2 == weight(o));
-  assert(8 == depth(o));
+  /* dupe insert */
+  assert(0 == soctree_insert(s, 0));
+  assert(2 == soctree_size(s));
+  assert(0 == soctree_find(s, 0));
 
-  destroy(o);
-
-  return EXIT_SUCCESS;
-
-  std::cout << std::hex << std::showbase << std::endl
-            << "octree::node * o == " << o << std::endl
-            << "octree::value( o ) == " << octree::value(o) << std::dec
-            << std::noshowbase << std::endl
-            << "octree::weight( o ) == " << octree::weight(o) << std::endl;
-
-  o = octree::insert(o, 0x42);
-
-  std::cout << std::hex << std::showbase << std::endl
-            << "octree::node * o == " << o << std::endl
-            << "octree::value( o ) == " << octree::value(o) << std::dec
-            << std::noshowbase << std::endl
-            << "octree::weight( o ) == " << octree::weight(o) << std::endl;
-
-  /* delete o ; */
-  octree::destroy(o);
-  o = nullptr;
-
-  std::cout << std::hex << std::showbase << std::endl
-            << "octree::node * o == " << o << std::endl
-            << "octree::value( o ) == " << octree::value(o) << std::endl;
+  soctree_delete(s);
+  s = 0;
 
   return EXIT_SUCCESS;
 }

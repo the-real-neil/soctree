@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #if HAVE_CONFIG_H
 #include "config.h"
@@ -14,9 +15,7 @@
 #error "missing config.h"
 #endif
 
-#define UINT24(V) ((0xffffff & (V)))
-
-#define VAL(NODEPTR) (UINT24((NODEPTR)->value_))
+#define UINT24(V) ((V) & ((uint32_t)0xffffff))
 
 /***************************************************************/
 /* http://www.pixelbeat.org/programming/gcc/static_assert.html */
@@ -66,16 +65,11 @@ typedef struct _node {
   } un_;
 } _node_t;
 
+#define CHILDREN(PTR) ((PTR)->un_.children_)
+#define LEAF(PTR) ((PTR)->un_.leaf_.lo08_)
+#define VALUE(PTR) ((PTR)->un_.leaf_.hi24_)
+
 STATIC_ASSERT(sizeof(_node_t) == 2 * sizeof(void *), "fail");
-
-#if 0
-template <typename T>
-bool _is_aligned(T const *const p, size_t const n = alignof(T)) {
-  return 0 == reinterpret_cast<uintptr_t>(p) % n;
-}
-#endif
-
-static int _imax(int a, int b) { return a < b ? b : a; }
 
 static bool _is_aligned(void *ptr) {
   return !((uintptr_t)ptr % sizeof(_node_t));
@@ -85,26 +79,7 @@ static _node_t *_validate(void *ptr) {
   return ptr && _is_aligned(ptr) ? ptr : NULL;
 }
 
-#if 0
-  std::ostream&
-  operator<<( std::ostream&os, node const&x )
-  {
-    return
-      os
-      << "{"
-      << "parent_:" << x.parent_
-      << ","
-      << "children_:" << x.children_
-      << ","
-      << "leaf_:" << x.leaf_
-      << ","
-      << "value_:" << x.value_
-      << "}"
-      ;
-  }
-#endif
-
-static _node_t *_children(_node_t *o) { return o->un_.children_; }
+static _node_t *_children(_node_t *o) { return CHILDREN(o); }
 
 static bool _has_children(_node_t *o) { return _validate(_children(o)); }
 
@@ -112,17 +87,17 @@ static bool _is_leaf(_node_t *o) { return 1 & o->un_.leaf_.lo08_; }
 
 static void _leaf_set(_node_t *o) { o->un_.leaf_.lo08_ |= 1; }
 
-static void _leaf_clear(_node_t *o) { o->un_.leaf_.lo08_ &= ~1; }
+static void _leaf_clear(_node_t *o) { o->un_.leaf_.lo08_ &= (uint8_t)~1; }
 
-static void _value_set(_node_t *o, int v) { o->un_.leaf_.hi24_ = UINT24(v); }
+static void _value_set(_node_t *o, uint32_t v) { VALUE(o) = UINT24(v); }
 
 static int _weight_recursive(_node_t *o) {
-  SPIT(std::cout << std::endl);
-
-  if (_is_leaf(o)) return 1;
-
-  if (!_has_children(o)) return 0;
-
+  if (_is_leaf(o)) {
+    return 1;
+  }
+  if (!_has_children(o)) {
+    return 0;
+  }
   int acc = 0;
   for (size_t i = 0; i != 8; ++i) {
     acc += _weight_recursive(_children(o) + i);
@@ -132,6 +107,7 @@ static int _weight_recursive(_node_t *o) {
 
 static int _weight(_node_t *o) { return _weight_recursive(o); }
 
+#if 0
 static int _depth_recursive(_node_t *o) {
   SPIT(std::cout << std::endl);
 
@@ -147,36 +123,37 @@ static int _depth_recursive(_node_t *o) {
 }
 
 static int _depth(_node_t *o) { return _depth_recursive(o); }
+#endif
 
-void _destroy_recursive(_node_t *o) {
-  SPIT(std::cout << std::endl);
+void _delete_recursive(_node_t *o) {
   if (_has_children(o)) {
     _node_t *children = _children(o);
     for (size_t i = 0; i < 8; ++i) {
-      _destroy_recursive(children + i);
+      _delete_recursive(children + i);
     }
     free(children);
   }
-  if (!o->parent_) free(o);
 }
 
-size_t _idx8(int const v, size_t const d) { return (7 & (v >> ((7 - d) * 3))); }
+size_t _idx8(uint32_t v, size_t d) { return (7 & (v >> ((7 - d) * 3))); }
+
+_node_t *_children_new(void) {
+  size_t n = 8 * sizeof(_node_t);
+  _node_t *ret = (_node_t *)malloc(n);
+  return memset(ret, 0, n);
+}
 
 /* take a _node_t, value, and depth (zero means root) */
-_node_t *_insert(_node_t *o, int v, size_t d) {
-  SPIT(std::cout << std::endl);
-
-  // assert(o);
+_node_t *_insert(_node_t *o, uint32_t v, size_t d) {
   /* at level 0, shift 21 bits */
   /* at level 7, shift  0 bits */
 
   if (_has_children(o)) {
     SPIT(std::cout);
-    return _insert(_children(o) + _idx8(v, d), v, d + 1);
+    return _insert(CHILDREN(o) + _idx8(v, d), v, d + 1);
   }
 
   if (!_is_leaf(o)) {
-    SPIT(std::cout << std::endl);
     /* unused _node_t */
     _leaf_set(o);
     _value_set(o, v);
@@ -185,22 +162,20 @@ _node_t *_insert(_node_t *o, int v, size_t d) {
 
   /* else occupied leaf */
 
-  if (UINT24(v) == o->value_) {
+  if (UINT24(v) == VALUE(o)) {
     /* same value */
     return o;
   }
 
   /* else different value */
 
-  o->leaf_ = 0;  // clear leaf bit
+  _leaf_clear(o);
 
-  int w = o->value_;  // save old value
-
-  o->value_ = 0;  // clear value
-
-  o->children_ = new _node_t[8];  // allocate children
-  for (size_t i = 0; i != 8; ++i) {
-    (o->children_ + i)->parent_ = o;
+  uint32_t w = VALUE(o);  // save old value
+  VALUE(o) = 0;           // clear value
+  CHILDREN(o) = _children_new();
+  for (size_t i = 0; i < 8; ++i) {
+    (CHILDREN(o) + i)->parent_ = o;
   }
 
   /* insert old value */
@@ -210,51 +185,98 @@ _node_t *_insert(_node_t *o, int v, size_t d) {
   return _insert(_children(o) + _idx8(v, d), v, d + 1);
 }
 
-int soctree_value(void *ptr) {
-  _node_t *o = (_node_t *)ptr;
-  if (_is_valid(o)) {
-    if (_is_leaf(o)) {
-      return o->value_;
+/* take a _node_t, value, and depth (zero means root) */
+_node_t *_find(_node_t *o, uint32_t v, size_t d) {
+  if (_is_leaf(o)) {
+    return VALUE(o) == v ? o : NULL;
+  }
+  if (!_has_children(o)) {
+    return NULL;
+  }
+  return _find(_children(o) + _idx8(v, d), v, d + 1);
+}
+
+struct soctree {
+  _node_t *root_;
+};
+
+soctree_t *soctree_new(void) {
+  soctree_t *ret = (soctree_t *)malloc(sizeof(soctree_t));
+  _node_t *root = (_node_t *)malloc(sizeof(_node_t));
+  if (ret && root) {
+    ret->root_ = memset(root, 0, sizeof(_node_t));
+    return ret;
+  }
+  free(root);
+  free(ret);
+  return NULL;
+}
+
+/* guard predicate */
+_node_t *_root(soctree_t *p) {
+  if (p) {
+    if (0 == (uintptr_t)p % sizeof(soctree_t)) {
+      return _validate(p->root_);
     }
   }
+  return NULL;
+}
+
+void soctree_delete(soctree_t *p) {
+  _node_t *root = _root(p);
+  if (root) {
+    _delete_recursive(root);
+    free(root);
+    root = 0;
+  }
+  free(p);
+}
+
+int soctree_insert(soctree_t *p, int w) {
+  _node_t *root = _root(p);
+  if (!root) {
+    return -1;
+  }
+  if (0 > w) {
+    return -1;
+  }
+  if (0xffffff < w) {
+    return -1;
+  }
+  _insert(root, 0xffffff & w, 0);
+  return 0;
+}
+
+#define UNUSED(X) (void)((X))
+
+int soctree_erase(soctree_t *p, int w) {
+  /* todo */
+  UNUSED(p);
+  UNUSED(w);
   return -1;
 }
 
-void *soctree_init(void) { return new _node_t; }
-
-void soctree_destroy(void *ptr) {
-  _node_t *o = (_node_t *)ptr;
-  if (_is_valid(o)) _destroy_recursive(o);
+int soctree_find(soctree_t *p, int w) {
+  _node_t *root = _root(p);
+  if (!root) {
+    goto fail;
+  }
+  if (0 > w) {
+    goto fail;
+  }
+  if (0xffffff < w) {
+    goto fail;
+  }
+  _node_t *found = _find(root, 0xffffff & w, 0);
+  if (!found) {
+    goto fail;
+  }
+  return 0;
+fail:
+  return -1;
 }
 
-int soctree_weight(void *ptr) {
-  _node_t *o = (_node_t *)ptr;
-  return _is_valid(o) ? _weight(o) : 0;
+int soctree_size(soctree_t *p) {
+  _node_t *root = _root(p);
+  return root ? _weight(root) : -1;
 }
-
-int soctree_depth(void *ptr) {
-  _node_t *o = (_node_t *)ptr;
-  return _is_valid(o) ? _depth(o) : 0;
-}
-
-void *soctree_insert(void *ptr, int v) {
-  SPIT(std::cout << std::endl);
-  _node_t *o = (_node_t *)ptr;
-  return _is_valid(o) ? _insert(o, v, 0) : nullptr;
-}
-
-#if 0
-
-_node_t*
-soctree::get( _node_t*root, uchar r, uchar g, uchar b )
-{
-  return _get( root, r, g, b );
-}
-
-void
-soctree::remove( _node_t*root, uchar r, uchar g, uchar b )
-{
-  _remove( root, r, g, b );
-}
-
-#endif
