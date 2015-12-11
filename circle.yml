@@ -1,0 +1,9 @@
+# github.com/rubicks/soctree/circle.yml
+machine:
+  services:
+    - docker
+
+test:
+  post:
+    - docker build -t soctree .
+
