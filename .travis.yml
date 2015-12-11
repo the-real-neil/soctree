@@ -10,4 +10,4 @@ services:
   - docker
 
 script:
-  - docker build -t morton .
+  - docker build -t soctree .
