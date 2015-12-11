@@ -1,0 +1,13 @@
+sudo: required
+
+language: c
+
+compiler:
+  - gcc
+  - clang
+
+services:
+  - docker
+
+script:
+  - docker build -t morton .
