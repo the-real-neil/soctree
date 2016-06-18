@@ -10,13 +10,14 @@ AC_LANG_PUSH([C])
 AC_CONFIG_SRCDIR([soctree.h])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([subdir-objects foreign tar-pax dist-bzip2 dist-xz])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects tar-pax dist-bzip2 dist-xz])
 LT_PREREQ([2.4.6])
 #LT_INIT([dlopen])
 LT_INIT([disable-shared])
 
 # Checks for programs.
 AC_PROG_CC
+AM_PROG_AR
 
 
 # Checks for libraries.

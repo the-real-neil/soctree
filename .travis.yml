@@ -1,6 +1,8 @@
-sudo: required
-
 language: c
+
+os:
+  - linux
+  - osx
 
 compiler:
   - gcc
@@ -10,4 +12,8 @@ services:
   - docker
 
 script:
-  - docker build -t soctree .
+  - mkdir -vp _build
+  - cd _build
+  - autoreconf -ivf ..
+  - ../configure
+  - make clean all check distcheck install

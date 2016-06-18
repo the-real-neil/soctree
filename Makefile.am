@@ -1,6 +1,5 @@
 # github.com/rubicks/soctree/Makefile.am
 
-
 ACLOCAL_AMFLAGS = -I m4
 
 AM_CFLAGS = \
@@ -11,22 +10,12 @@ AM_CFLAGS = \
   -pedantic-errors \
   -std=c99
 
-
 lib_LTLIBRARIES = liboctree.la
 liboctree_la_SOURCES = \
   morton.c \
   morton.h \
   soctree.c \
   soctree.h
-
-
-# noinst_lib_LTLIBRARIES = liboctree.la
-# liboctree_la_SOURCES = octree.hh octree.cc
-
-# bin_PROGRAMS = demo
-# demo_SOURCES = demo.cc
-# demo_LDADD = liboctree.la
-
 
 # When check_PROGRAMS are linked against dynamic lib_LTLIBRARIES, automake
 # generates them as posix shell scripts.
