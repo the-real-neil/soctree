@@ -8,9 +8,6 @@ compiler:
   - gcc
   - clang
 
-services:
-  - docker
-
 script:
   - mkdir -vp _build
   - cd _build
